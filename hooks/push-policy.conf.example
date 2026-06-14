@@ -1,0 +1,17 @@
+# VibeX push policy — maps a remote-URL substring to the git user.email allowed to
+# push there. The guard-bash.sh hook blocks any `git push` where the current
+# user.email does not match the entry for the target remote, or where the remote is
+# not listed at all.
+#
+# To enable: copy this file to "push-policy.conf" in the same directory and edit it
+# with your real remotes and emails. push-policy.conf is gitignored, so your
+# addresses stay off the repo. With no push-policy.conf present, the gate is off.
+#
+# Format (whitespace-separated, first matching line wins):
+#   <url-substring>   <allowed-email>
+#
+# Examples:
+#   github.com:personal   you@personal.example
+#   github.com/your-user  you@personal.example
+#   github.com:work       you@company.example
+#   gitlab.com/acme       you@company.example

@@ -43,6 +43,22 @@ user memory (`~/.claude/CLAUDE.md`):
 @/path/to/VibeX/CLAUDE.md
 ```
 
+## Push identity gate (personal vs work)
+
+`hooks/guard-bash.sh` can hard-block a `git push` whose git identity doesn't match
+the target remote — useful when one machine has multiple SSH keys / accounts. It's
+opt-in: copy the template and fill in your remotes.
+
+```
+cp hooks/push-policy.conf.example hooks/push-policy.conf
+# edit it: each line maps a remote-URL substring to the user.email allowed to push there
+```
+
+With the policy in place, a push is **denied** if the current `git config user.email`
+doesn't match the entry for the destination remote, or if the remote isn't listed at
+all. `push-policy.conf` is gitignored, so your addresses never enter the repo. No
+policy file = gate off.
+
 ## Extending VibeX
 
 Ask Claude to "create a new skill" — the bundled `new-skill` skill scaffolds it with

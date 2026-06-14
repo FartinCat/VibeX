@@ -7,6 +7,9 @@
 # Local Claude state (don't ship machine-specific settings)
 .claude/settings.local.json
 
+# Local push policy — your real remotes/emails stay off the repo
+hooks/push-policy.conf
+
 # Logs / scratch
 *.log
 tmp/
