@@ -52,7 +52,11 @@ in the working tree together.
    ```
 
 6. **Respect the guardrails.** Branch for non-trivial work — never commit straight to
-   `main`/`master`. Do NOT `git push` unless the user explicitly asked.
+   `main`/`master`. **Never `git push` on your own.** Before any push, confirm with
+   the user **which remote and branch**, and surface the current
+   `git config user.email` plus the target remote's URL so they can confirm the
+   identity is correct — when a machine has multiple remotes or SSH keys (e.g.
+   personal vs work), never assume the destination or identity.
 
 ## Output format (copyable plan)
 
