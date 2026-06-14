@@ -1,0 +1,15 @@
+{
+  "name": "vibex",
+  "version": "0.1.0",
+  "description": "A personal, version-controlled agentic toolkit for Claude Code: curated skills, workflow commands, subagents, and guardrails for software development.",
+  "author": {
+    "name": "FartinCat"
+  },
+  "keywords": [
+    "agent",
+    "skills",
+    "workflow",
+    "software-development",
+    "guardrails"
+  ]
+}

@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Local Claude state (don't ship machine-specific settings)
+.claude/settings.local.json
+
+# Logs / scratch
+*.log
+tmp/

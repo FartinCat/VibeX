@@ -1,0 +1,16 @@
+{
+  "name": "vibex",
+  "owner": {
+    "name": "FartinCat"
+  },
+  "metadata": {
+    "description": "VibeX marketplace — install the VibeX agentic toolkit into any project."
+  },
+  "plugins": [
+    {
+      "name": "vibex",
+      "source": "./",
+      "description": "Curated skills, workflow commands, subagents, and guardrails for software development."
+    }
+  ]
+}
