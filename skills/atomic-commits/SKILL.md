@@ -30,29 +30,70 @@ in the working tree together.
    git diff --staged   # already staged
    ```
 
-2. **Plan the commits.** Read the diff and list the distinct logical groups out loud,
+2. **Plan the commits.** Read the diff and group it into distinct logical changes,
    e.g. "(1) fix off-by-one in pager, (2) rename `cfg`→`config`, (3) add CHANGELOG
    entry". Decide commit order so each one is self-contained — usually
    prerequisites/refactors first, then the feature that uses them.
 
-3. **For each group, in order:**
-   - **Stage precisely** (see below) — only the hunks for *this* concern.
-   - **Verify the staged set** matches exactly one concern, nothing extra:
-     ```
-     git diff --staged
-     ```
-   - **Commit** with a focused message:
-     ```
-     git commit -m "Subject" -m "Body explaining what + why"
-     ```
+3. **Present the plan as a copyable block** (see [Output format](#output-format-copyable-plan)).
+   Each commit lists its related files and a ready-to-run `git add` + `git commit`
+   block the user can copy with one click, plus a single "copy-all" block.
 
-4. **Repeat** until the tree is clean:
+4. **Then either** run the commands yourself (only if the user asked you to commit)
+   **or** let the user copy and run them. When you run them, do it group by group and
+   **verify the staged set** before each commit — exactly one concern, nothing extra:
+   ```
+   git diff --staged
+   ```
+
+5. **Repeat** until the tree is clean:
    ```
    git status --porcelain   # empty output = done
    ```
 
-5. **Respect the guardrails.** Branch for non-trivial work — never commit straight to
+6. **Respect the guardrails.** Branch for non-trivial work — never commit straight to
    `main`/`master`. Do NOT `git push` unless the user explicitly asked.
+
+## Output format (copyable plan)
+
+Always present the result so the commands are **copy-paste runnable**. Put every
+command in a fenced `bash` block (IDEs render these with a one-click copy button).
+Do not interleave prose inside the block — keep it pure shell so it runs as-is.
+
+For each atomic commit, show its **related files** and its block:
+
+> **Commit 1 — Fix pager off-by-one**
+> Files: `src/pager.py`
+> ```bash
+> git add src/pager.py
+> git commit -m "Fix pager off-by-one" \
+>   -m "Page boundary was inclusive and dropped the last row; make it exclusive."
+> ```
+>
+> **Commit 2 — Rename cfg to config**
+> Files: `src/config.py`, `src/main.py`
+> ```bash
+> git add src/config.py src/main.py
+> git commit -m "Rename cfg to config for clarity"
+> ```
+
+Then end with one **copy-all** block that runs the whole plan in order:
+
+```bash
+git add src/pager.py
+git commit -m "Fix pager off-by-one" \
+  -m "Page boundary was inclusive and dropped the last row; make it exclusive."
+
+git add src/config.py src/main.py
+git commit -m "Rename cfg to config for clarity"
+```
+
+When a commit needs a sub-file split, put its staging steps in the same block:
+```bash
+git diff -- src/big.py > /tmp/commit3.patch   # then trim to this concern's hunks
+git apply --cached /tmp/commit3.patch
+git commit -m "Extract retry helper"
+```
 
 ## Staging precisely
 
