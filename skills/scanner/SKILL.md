@@ -23,12 +23,27 @@ bundled `inventory.sh`; your job is the analysis and the write-up.
    [project-types.md](project-types.md). State a confidence level and the evidence.
    If it's a monorepo, classify each workspace.
 
-3. **Hunt anomalies.** Use the inventory plus targeted `Grep`/`Read` to check:
+3. **Check imports exhaustively** (JS/TS + Python). Run the bundled checker (needs
+   `python3`):
+   ```
+   python3 import_graph.py
+   ```
+   It builds the real import graph and resolves every edge, then prints
+   `### IMPORT_GRAPH` (per-language tier + edge stats), `### BROKEN_IMPORTS`,
+   `### CASE_MISMATCH` (imports that only work on case-insensitive filesystems — they
+   break on Linux), `### MISSING_DEPS`, `### UNVERIFIED`, and an `### EDGES_JSON`
+   artifact. It prefers the native toolchain (Tier 1, e.g. `tsc`) and falls back to a
+   built-in resolver (Tier 2); the `tier=` field says which ran. Each finding carries
+   a confidence tag — surface the high-confidence ones first. Save the `### EDGES_JSON`
+   block to `<NEXT_REPORT minus .md>.imports.json` (e.g. `scan_03.imports.json`).
+
+4. **Hunt other anomalies.** Use the inventory plus targeted `Grep`/`Read` to check:
    - **Asset placement** — asset folders (`### ASSET_DIRS`) in the conventional spot
      for this project type (e.g. web `public/`/`src/assets`, Android `res/`,
      Unity `Assets/`). Flag stray, duplicated, or deeply-nested asset dirs.
-   - **Broken/wrong imports** — spot-check `import`/`require`/`include`/`#include`
-     statements that point at relative paths or modules that don't exist on disk.
+   - **Other-language imports** — for C/C++/Go/Rust/Java/C# (not covered by the
+     checker), spot-check `include`/`use`/`import` statements against the filesystem,
+     or run that language's native check (`go list ./...`, `cargo check`) if present.
    - **File / naming mismatches** — extension vs content (e.g. JSX in a `.js` under a
      TS project), files outside their conventional dir (tests, components), casing
      inconsistencies.
@@ -36,10 +51,10 @@ bundled `inventory.sh`; your job is the analysis and the write-up.
      paths, missing entrypoint/README, empty or orphaned directories.
    Only report findings you can substantiate; cite `path:line` where relevant.
 
-4. **Write the report** to the `### NEXT_REPORT` path using the template below. Never
+5. **Write the report** to the `### NEXT_REPORT` path using the template below. Never
    overwrite an existing `scan_NN.md` — always use the path the script computed.
 
-5. **Summarize to the user**: project type, the top findings by severity, and the
+6. **Summarize to the user**: project type, the top findings by severity, and the
    report path.
 
 ## Report template
@@ -65,6 +80,12 @@ bundled `inventory.sh`; your job is the analysis and the write-up.
 ### Notes
 - ...
 
+## Imports
+- Tiers: js_ts=<tier>, python=<tier>
+- Edges: N (internal/external/builtin/missing/unresolved)
+- Broken imports & case mismatches: <count> (details under Findings)
+- Full graph: `scan_NN.imports.json`
+
 ## Stats
 - Files: N, Dirs: N
 - Top extensions: ...
@@ -79,4 +100,10 @@ bundled `inventory.sh`; your job is the analysis and the write-up.
   `Pods`, …) so the tree stays about the source, not dependencies.
 - Reports accumulate under `logs/scanner_reports/`. Suggest gitignoring that folder
   if the user doesn't want scan history committed.
-- `inventory.sh` only reads and reports — it never modifies the project.
+- `inventory.sh` and `import_graph.py` only read and report — they never modify the
+  project.
+- `import_graph.py` covers JS/TS + Python today. Tier 1 (native `tsc`) is best-effort:
+  it's skipped/labelled honestly when the toolchain is absent or the project's
+  tsconfig aborts it, and bare-package `tsc` errors are ignored unless `node_modules`
+  is installed (so declared-but-uninstalled deps aren't false-flagged). Tier 2 (the
+  built-in resolver) always runs.

@@ -10,6 +10,10 @@
 # Local push policy — your real remotes/emails stay off the repo
 hooks/push-policy.conf
 
+# Python bytecode (from bundled scanner scripts)
+__pycache__/
+*.pyc
+
 # Logs / scratch
 *.log
 tmp/
